@@ -2,6 +2,6 @@
 
 csapattagok:
 
-Bicskey Balázs
-Jankó Julianna
-Holbok Péter
+>Bicskey Balázs
+>Jankó Julianna
+>Holbok Péter
