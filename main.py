@@ -12,6 +12,14 @@ pygame.display.set_icon(pygame.image.load('képek/icon.png'))
 # óra
 clock = pygame.time.Clock()
 
+# egér
+egér = pygame.mouse.get_pos()
+
+# menü
+start_gomb = pygame.image.load('képek/start-gomb.png').convert()
+start_gomb_rect = start_gomb.get_rect(midbottom=(600, 150))
+menu = True
+
 # mezők
 teszt_mezo1 = pygame.image.load('képek/teszt-mezo1.png').convert()
 teszt_mezo2 = pygame.image.load('képek/teszt-mezo2.png').convert()
@@ -76,6 +84,28 @@ def mezok_megjelenitese(palya):
 
 # játék
 while True:
+    # menü
+    while menu:
+        for event in pygame.event.get():
+
+            # játék bezárása (menüben)
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            
+            egér = pygame.mouse.get_pos()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_gomb_rect.collidepoint(egér):
+                    menu = False
+                    break
+
+        ablak.blit(start_gomb, start_gomb_rect)
+
+        pygame.display.update()
+
+        clock.tick(60)
+
     for event in pygame.event.get():
 
         # játék bezárása
