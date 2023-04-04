@@ -1,6 +1,6 @@
 import pygame
 from sys import exit
-from erintkezesek import erintkezes_bal, erintkezes_jobb, erintkezes_fel, erintkezes_le
+from erintkezesek import erintkezes_balra, erintkezes_felfele, erintkezes_jobbra, erintkezes_lefele
 
 pygame.init()
 
@@ -43,7 +43,7 @@ kamera_mozgas_frame_jobb = 0
 hatter1 = pygame.image.load('képek/hatter1.png').convert()
 
 # pálya beolvasása
-with open('pályák/teszt-palya1.txt', 'r') as file:
+with open('pályák/teszt-palya1.txt', 'r', encoding='utf-8') as file:
     teszt_palya_1 = ''
     for szam in file.read():
         if szam != '\n':
@@ -86,7 +86,7 @@ while True:
         # ugrás
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                if erintkezes_le(mezok, jatekos_rect):
+                if erintkezes_lefele(mezok, jatekos_rect):
                     gravitacio -= 15
                     ugras_frame += 15
 
@@ -111,11 +111,11 @@ while True:
     mozgo_mezok.append(mozgo_mezo1_rect)
     ablak.blit(mozgo_mezo1, (mozgo_mezo1_rect))
 
-    if erintkezes_le(mozgo_mezok, jatekos_rect):
+    if erintkezes_lefele(mozgo_mezok, jatekos_rect):
         jatekos_rect.centerx += mozgo_mezo_iranya
-    if mozgo_mezo_iranya > 0 and erintkezes_bal(mozgo_mezok, jatekos_rect):
+    if mozgo_mezo_iranya > 0 and erintkezes_balra(mozgo_mezok, jatekos_rect):
         jatekos_rect.centerx += mozgo_mezo_iranya
-    if mozgo_mezo_iranya < 0 and erintkezes_jobb(mozgo_mezok, jatekos_rect):
+    if mozgo_mezo_iranya < 0 and erintkezes_jobbra(mozgo_mezok, jatekos_rect):
         jatekos_rect.centerx += mozgo_mezo_iranya
 
     # mozgás jobbra és balra
@@ -123,32 +123,32 @@ while True:
 
     if billentyu[pygame.K_d]:
         for e in range(8):
-            if erintkezes_jobb(mezok, jatekos_rect) == False:
+            if erintkezes_jobbra(mezok, jatekos_rect) == False:
                 jatekos_rect.centerx += 1
                 jatekos_x_koordinata += 1
     if billentyu[pygame.K_a]:
         for e in range(8):
-            if erintkezes_bal(mezok, jatekos_rect) == False:
+            if erintkezes_balra(mezok, jatekos_rect) == False:
                 jatekos_rect.centerx -= 1
                 jatekos_x_koordinata -= 1
 
     # gravitáció
-    if erintkezes_fel(mezok, jatekos_rect):
+    if erintkezes_felfele(mezok, jatekos_rect):
         ugras_frame = 0
         gravitacio = eredeti_gravitacio
     if ugras_frame > 0:
         ugras_frame -= 1
         gravitacio += 1
-    if erintkezes_le(mezok, jatekos_rect):
+    if erintkezes_lefele(mezok, jatekos_rect):
         gravitacio -= eredeti_gravitacio
     if gravitacio > 0:
         for e in range(gravitacio):
             jatekos_rect.centery += 1
-            if erintkezes_le(mezok, jatekos_rect):
+            if erintkezes_lefele(mezok, jatekos_rect):
                 break
     if gravitacio < 0:
         for e in range(-gravitacio):
-            if erintkezes_fel(mezok, jatekos_rect):
+            if erintkezes_felfele(mezok, jatekos_rect):
                 ugras_frame = 0
                 gravitacio = eredeti_gravitacio
                 break
