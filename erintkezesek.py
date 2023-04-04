@@ -2,7 +2,7 @@ import pygame
 
 
 # megnézi hogy a játékos talajon van-e
-def erintkezes_le(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
+def erintkezes_lefele(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
     erintkezes_le = False
     for mezo_rect in megadott_mezo_lista:
         mezo_rect_x = range(mezo_rect.centerx - 20, mezo_rect.centerx + 20)
@@ -11,9 +11,11 @@ def erintkezes_le(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
                 erintkezes_le = True
                 break
     return erintkezes_le
-    
+
 # megnézi hogy van-e fal a játékos mellett vagy felett
-def erintkezes_bal(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
+
+
+def erintkezes_balra(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
     erintkezes_bal = False
     for mezo_rect in megadott_mezo_lista:
         mezo_rect_y = range(mezo_rect.centery - 20, mezo_rect.centery + 20)
@@ -22,8 +24,9 @@ def erintkezes_bal(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
                 erintkezes_bal = True
                 break
     return erintkezes_bal
-    
-def erintkezes_jobb(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
+
+
+def erintkezes_jobbra(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
     erintkezes_jobb = False
     for mezo_rect in megadott_mezo_lista:
         mezo_rect_y = range(mezo_rect.centery - 20, mezo_rect.centery + 20)
@@ -32,8 +35,9 @@ def erintkezes_jobb(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
                 erintkezes_jobb = True
                 break
     return erintkezes_jobb
-    
-def erintkezes_fel(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
+
+
+def erintkezes_felfele(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
     erintkezes_fel = False
     for mezo_rect in megadott_mezo_lista:
         mezo_rect_x = range(mezo_rect.centerx - 20, mezo_rect.centerx + 20)
