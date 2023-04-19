@@ -1,8 +1,18 @@
 import pygame
 from sys import exit
 from erintkezesek import erintkezes_balra, erintkezes_felfele, erintkezes_jobbra, erintkezes_lefele
+from Palya import Palya
 
 pygame.init()
+
+# pálya osztály
+palyak: list[Palya] = []
+palya_szama: int = 1
+for e in range(2):
+    fajl_neve: str = 'pályák/palya' + str(palya_szama) + '.txt'
+    with open(fajl_neve, 'r', encoding='utf-8') as fajl:
+        palyak.append(Palya(fajl.read()))
+    palya_szama += 1
 
 # ablak beállításai
 ablak = pygame.display.set_mode((1200, 600))
@@ -50,13 +60,12 @@ kamera_mozgas_frame_jobb = 0
 # hátterek
 hatter1 = pygame.image.load('képek/hatter1.png').convert()
 
-# pálya beolvasása
-with open('pályák/teszt-palya1.txt', 'r', encoding='utf-8') as file:
-    teszt_palya_1 = ''
-    for szam in file.read():
-        if szam != '\n':
-            teszt_palya_1 += szam
-
+# elmentett adatok
+def mentett_adatok_lekerese(sor):
+    mentes: str = ''
+    with open('mentes.txt', 'r', encoding='utf-8') as file:
+        mentes = file.read().splitlines()[sor]
+    return mentes
 
 def mezok_megjelenitese(palya):
     # (egy mező 40×40 pixel, összesen 100×14 mező van egy pályában)
@@ -81,7 +90,6 @@ def mezok_megjelenitese(palya):
 
         mezo_x_koordinata += 40
 
-
 # játék
 while True:
     # menü
@@ -92,7 +100,7 @@ while True:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            
+
             egér = pygame.mouse.get_pos()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -119,7 +127,7 @@ while True:
                 if erintkezes_lefele(mezok, jatekos_rect):
                     gravitacio -= 15
                     ugras_frame += 15
-
+    
     # kiüríti a mezők listát hogy ne laggoljon a játék
     mezok = []
 
@@ -127,7 +135,8 @@ while True:
     ablak.blit(hatter1, (0, 0))
 
     # mezők megjelenítése
-    mezok_megjelenitese(teszt_palya_1)
+    melyik_palyan_van = int(mentett_adatok_lekerese(1))
+    mezok_megjelenitese(palyak[melyik_palyan_van - 1].txt_fajl)
 
     # mozgó mező
     if mozgo_mezo_frame < 200:
