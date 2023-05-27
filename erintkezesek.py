@@ -1,7 +1,7 @@
 import pygame
 
 
-# megnézi hogy a játékos talajon van-e
+# megnézi, hogy a játékos talajon van-e
 def erintkezes_lefele(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
     erintkezes_le = False
     for mezo_rect in megadott_mezo_lista:
@@ -12,9 +12,7 @@ def erintkezes_lefele(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
                 break
     return erintkezes_le
 
-# megnézi hogy van-e fal a játékos mellett vagy felett
-
-
+# megnézi, hogy van-e fal a játékos mellett vagy felett
 def erintkezes_balra(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
     erintkezes_bal = False
     for mezo_rect in megadott_mezo_lista:
@@ -46,3 +44,12 @@ def erintkezes_felfele(megadott_mezo_lista, megadott_rectangle: pygame.Rect):
                 erintkezes_fel = True
                 break
     return erintkezes_fel
+
+def erintkezes_barhogy(megadott_rect1: pygame.Rect, megadott_rect2: pygame.Rect):
+    erintkezes_barhogy = False
+    megadott_rect2_x = range(megadott_rect2.centerx - 20, megadott_rect2.centerx + 20)
+    megadott_rect2_y = range(megadott_rect2.centery - 20, megadott_rect2.centery + 20)
+    if megadott_rect1.left in megadott_rect2_x or megadott_rect1.right in megadott_rect2_x:
+        if megadott_rect1.bottom in megadott_rect2_y or megadott_rect1.top in megadott_rect2_y:
+            erintkezes_barhogy = True
+    return erintkezes_barhogy

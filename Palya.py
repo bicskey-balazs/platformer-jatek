@@ -1,19 +1,18 @@
 class Palya:
     txt_fajl: str
-    palya_vege: str
-    kezdo_pont: str
+    kezdo_pont_x: str
+    kezdo_pont_y: str
 
-    def palya_beolvasasa(self, palya):
+    def palya_beolvasasa(self, palya: list):
         vissza: str = ''
-        for kar in palya:
-            if kar != '\n':
-                vissza += kar
+        for e in palya:
+            vissza += str(e).strip('\n')
         return vissza
 
     def __init__(self, fajl):
-        t = fajl[0:1413]
-        pv = fajl[1414:1419]
-        kp = fajl[1420:1425]
-        self.txt_fajl = self.palya_beolvasasa(t)
-        self.palya_vege = pv
-        self.kezdo_pont = kp
+        self.txt_fajl = self.palya_beolvasasa(fajl[0:13])
+        self.kezdo_pont_x = int(str(fajl[14]).strip('\n'))
+        self.kezdo_pont_y = int(str(fajl[15]).strip('\n'))
+
+#pv = fajl[1414:1419]
+#kp = fajl[1420:1425]
