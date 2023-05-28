@@ -3,7 +3,9 @@ from sys import exit
 from erintkezesek import erintkezes_balra, erintkezes_felfele, erintkezes_jobbra, erintkezes_lefele
 from Palya import Palya
 
+
 pygame.init()
+
 
 # pálya osztály
 palyak: list[Palya] = []
@@ -27,8 +29,10 @@ egér = pygame.mouse.get_pos()
 
 # menü
 start_gomb = pygame.image.load('képek/start-gomb.png').convert()
-start_gomb_rect = start_gomb.get_rect(midbottom=(600, 150))
+start_gomb_rect = start_gomb.get_rect(midbottom=(300, 150))
 menu = True
+karakterek_gomb = pygame.image.load('képek/karakter-valasztas-gomb.png').convert()
+karakterek_gomb_rect = karakterek_gomb.get_rect(midbottom=(900, 150))
 
 # mezők
 teszt_mezo1 = pygame.image.load('képek/teszt-mezo1.png').convert()
@@ -61,11 +65,14 @@ kamera_mozgas_frame_jobb = 0
 hatter1 = pygame.image.load('képek/hatter1.png').convert()
 
 # elmentett adatok
+
+
 def mentett_adatok_lekerese(sor):
     mentes: str = ''
     with open('mentes.txt', 'r', encoding='utf-8') as file:
         mentes = file.read().splitlines()[sor]
     return mentes
+
 
 def mezok_megjelenitese(palya):
     # (egy mező 40×40 pixel, összesen 100×14 mező van egy pályában)
@@ -90,6 +97,79 @@ def mezok_megjelenitese(palya):
 
         mezo_x_koordinata += 40
 
+
+def karakterek_menu():
+    pygame.init()
+
+    display_width = 1200
+    display_height = 600
+    screen = pygame.display.set_mode((display_width, display_height))
+    pygame.display.set_caption("Karakter skinek")
+
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+
+    választott_skin = ["képek//skin1.png", "képek//skin2.png"]
+    karakter_index = 0
+
+    character_images = []
+    for skin in választott_skin:
+        character_images.append(pygame.image.load(skin))
+
+    button_width = 100
+    button_height = 50
+    button_x = display_width - button_width - 20
+    button_y = display_height - button_height - 20
+
+    start_button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    back_button_rect = pygame.Rect(button_x - button_width - 10, button_y, button_width, button_height)
+    save_button_rect = pygame.Rect(button_x - button_width - 10, button_y - button_height - 10, button_width, button_height)
+
+    running = True
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    karakter_index = (karakter_index - 1) % len(választott_skin)
+                elif event.key == pygame.K_RIGHT:
+                    karakter_index = (karakter_index + 1) % len(választott_skin)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if back_button_rect.collidepoint(mouse_pos):
+                    running = False
+                if save_button_rect.collidepoint(mouse_pos):
+                    save_selected_skin(választott_skin[karakter_index])
+
+        screen.fill(BLACK)
+
+        selected_skin_image = character_images[karakter_index]
+        screen.blit(selected_skin_image, (display_width // 2 - selected_skin_image.get_width() // 2,
+                                          display_height // 2 - selected_skin_image.get_height() // 2))
+
+        pygame.draw.rect(screen, RED, back_button_rect)
+        pygame.draw.rect(screen, GREEN, start_button_rect)
+        pygame.draw.rect(screen, WHITE, save_button_rect)
+
+        font = pygame.font.Font(None, 28)
+        text = font.render("Save Skin", True, BLACK)
+        text_rect = text.get_rect(center=save_button_rect.center)
+        screen.blit(text, text_rect)
+
+        pygame.display.flip()
+
+    pygame.display.quit()
+
+
+def save_selected_skin(selected_skin):
+    with open("selected_skin.txt", "w", encoding="utf-8") as file:
+        file.write(selected_skin)
+
+
 # játék
 while True:
     # menü
@@ -107,8 +187,11 @@ while True:
                 if start_gomb_rect.collidepoint(egér):
                     menu = False
                     break
+                if karakterek_gomb_rect.collidepoint(egér):
+                    karakterek_menu()
 
         ablak.blit(start_gomb, start_gomb_rect)
+        ablak.blit(karakterek_gomb, karakterek_gomb_rect)
 
         pygame.display.update()
 
@@ -127,7 +210,7 @@ while True:
                 if erintkezes_lefele(mezok, jatekos_rect):
                     gravitacio -= 15
                     ugras_frame += 15
-    
+
     # kiüríti a mezők listát hogy ne laggoljon a játék
     mezok = []
 
