@@ -1,6 +1,6 @@
 import pygame
 from sys import exit
-from erintkezesek import erintkezes_balra, erintkezes_felfele, erintkezes_jobbra, erintkezes_lefele, erintkezes_barhogy
+from erintkezesek import *
 from Palya import Palya
 
 pygame.init()
@@ -44,8 +44,18 @@ mezok: list[pygame.Rect] = []  # amelyik rectangelek ebben a listában vannak az
 # mozgo_mezo1_rect = mozgo_mezo1.get_rect(midbottom=(-1000, 280))
 # mozgo_mezo_frame = 0
 # mozgo_mezo_iranya = -2
-
 # mozgo_mezok: list[pygame.Rect] = []
+
+# sebződés
+sebzo_mezo1 = pygame.image.load('képek/sebzo-mezo1.png').convert()
+sebzo_mezok: list[pygame.Rect] = []
+halhatatlan_frame = 0
+
+# halál
+halal = False
+halal_felirat = menu_felirat_font.render('Meghaltál!', False, 'Red')
+ujra_gomb = pygame.image.load('képek/ujra-gomb.png').convert()
+ujra_gomb_rect = start_gomb.get_rect(midbottom=(600, 250))
 
 # kamera
 kamera_mozgas = 0
@@ -83,9 +93,24 @@ ugras_frame = 0
 jatekos = pygame.image.load('képek/jatekos.png').convert_alpha()
 jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
 
+# életerő
+eletero_pont = pygame.image.load('képek/hp.png').convert()
+eletero_pont_rect = eletero_pont.get_rect(midbottom=(150, 40))
+eletero_szama = 5
+eletero_kiiras_seged = 0
+
 # adatok kiírásához kellenek
 palya_szama_font = pygame.font.Font(None, 50)
 palya_szama_kiiras = palya_szama_font.render(str(melyik_palyan_van) + '. pálya', False, 'White')
+kiiras_hatter = pygame.image.load('képek/kiiras-hatter1.png').convert()
+kiiras_hatter_rect = kiiras_hatter.get_rect(midbottom=(0, 45))
+
+# idő számolása
+szamlalo_masodperc = 0
+szamlalo_perc = 0
+pygame.time.set_timer(pygame.USEREVENT, 1000)
+szamlalo_font = pygame.font.SysFont('Consolas', 30)
+szamlalo_kiiras = szamlalo_font.render(str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
 
 def mezok_megjelenitese(palya):
     # (egy mező 40×40 pixel, összesen 100×14 mező van egy pályában)
@@ -110,6 +135,9 @@ def mezok_megjelenitese(palya):
         elif mezo == '3':
             palya_vege_rect.topleft=(mezo_x_koordinata, mezo_y_koordinata)
             ablak.blit(palya_vege, (mezo_x_koordinata, mezo_y_koordinata))
+        elif mezo == '4':
+            sebzo_mezok.append(pygame.draw.rect(ablak, (0, 0, 0), (mezo_x_koordinata, mezo_y_koordinata, 40, 40)))
+            ablak.blit(sebzo_mezo1, (mezo_x_koordinata, mezo_y_koordinata))
 
         mezo_x_koordinata += 40
 
@@ -129,6 +157,8 @@ while True:
             # start gomb
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_gomb_rect.collidepoint(egér):
+                    szamlalo_masodperc = 0
+                    szamlalo_perc = 0
                     menu = False
                     break
 
@@ -159,6 +189,14 @@ while True:
 
     for event in pygame.event.get():
 
+        # számláló
+        if event.type == pygame.USEREVENT: 
+            szamlalo_masodperc += 1
+            szamlalo_kiiras = szamlalo_font.render(str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
+        if szamlalo_masodperc == 60:
+            szamlalo_masodperc = 0
+            szamlalo_perc += 1
+
         # játék bezárása
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -173,12 +211,20 @@ while True:
     
     # kiüríti a mezők listát hogy ne laggoljon a játék
     mezok = []
+    sebzo_mezok = []
 
     # háttér megjelenítése
     ablak.blit(hatter1, (0, 0))
 
     # képernyőre kiírt infók
+    ablak.blit(kiiras_hatter, kiiras_hatter_rect)
     ablak.blit(palya_szama_kiiras, (0, 0))
+    eletero_kiiras_seged = 0
+    for e in range(eletero_szama):
+        eletero_pont_rect = eletero_pont.get_rect(midbottom=(150 + eletero_kiiras_seged, 40))
+        ablak.blit(eletero_pont, eletero_pont_rect)
+        eletero_kiiras_seged += 39
+    ablak.blit(szamlalo_kiiras, (1116, 0))
 
     # átvált a következő pályára
     if erintkezes_barhogy(jatekos_rect, palya_vege_rect):
@@ -202,11 +248,16 @@ while True:
             ablak.blit(hatter1, (0, 0))
             ablak.blit(palya_teljesitve_felirat, (325, 100))
             ablak.blit(kovetkezo_palya_gomb, kovetkezo_palya_gomb_rect)
+            szamlalo_kiiras = szamlalo_font.render('idő: ' + str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
+            ablak.blit(szamlalo_kiiras, (325, 350))
 
             pygame.display.update()
 
             clock.tick(60)
         kamera_mozgas = 0
+        szamlalo_masodperc = 0
+        szamlalo_perc = 0
+        szamlalo_kiiras = szamlalo_font.render(str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
         melyik_palyan_van += 1
         jatekos_x_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_x
         jatekos_y_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_y
@@ -223,6 +274,44 @@ while True:
 
     # mezők megjelenítése
     mezok_megjelenitese(palyak[melyik_palyan_van - 1].txt_fajl)
+
+    # sebződés
+    if halhatatlan_frame == 0:
+        if erintkezes_sebzovel(jatekos_rect, sebzo_mezok):
+            eletero_szama -= 1
+            if eletero_szama > 0:
+                halhatatlan_frame += 60
+    # halál
+    if eletero_szama == 0 or jatekos_rect.centery > 700:
+        halal = True
+        while halal:
+            for event in pygame.event.get():
+
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+                egér = pygame.mouse.get_pos()
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if ujra_gomb_rect.collidepoint(egér):
+                        kamera_mozgas = 0
+                        jatekos_x_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_x
+                        jatekos_y_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_y
+                        jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
+                        eletero_szama = 5
+                        szamlalo_masodperc = 0
+                        szamlalo_perc = 0
+                        halal = False
+                        break
+                
+            ablak.blit(hatter1, (0, 0))
+            ablak.blit(halal_felirat, (425, 100))
+            ablak.blit(ujra_gomb, ujra_gomb_rect)
+                
+            pygame.display.update()
+
+            clock.tick(60)
 
     # mozgó mező
     # if mozgo_mezo_frame < 200:
@@ -325,7 +414,12 @@ while True:
         kamera_mozgas_frame_jobb -= 8
     
     # játékos megjelenítése
-    ablak.blit(jatekos, (jatekos_rect))
+    if halhatatlan_frame % 6 != 0 or halhatatlan_frame == 0:
+        ablak.blit(jatekos, (jatekos_rect))
+    
+    # sebződés utáni halhatatlanság
+    if halhatatlan_frame > 0:
+        halhatatlan_frame -= 1
 
     pygame.display.update()
 

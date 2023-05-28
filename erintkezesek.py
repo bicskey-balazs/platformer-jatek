@@ -53,3 +53,13 @@ def erintkezes_barhogy(megadott_rect1: pygame.Rect, megadott_rect2: pygame.Rect)
         if megadott_rect1.bottom in megadott_rect2_y or megadott_rect1.top in megadott_rect2_y:
             erintkezes_barhogy = True
     return erintkezes_barhogy
+
+def erintkezes_sebzovel(megadott_rect: pygame.Rect, megadott_lista):
+    erintkezes_sebzovel = False
+    for mezo_rect in megadott_lista:
+        mezo_rect_x = range(mezo_rect.centerx - 20, mezo_rect.centerx + 20)
+        mezo_rect_y = range(mezo_rect.centery - 19, mezo_rect.centery + 21)
+        if megadott_rect.left in mezo_rect_x or megadott_rect.right in mezo_rect_x:
+            if megadott_rect.bottom in mezo_rect_y or megadott_rect.top in mezo_rect_y:
+                erintkezes_sebzovel = True
+    return erintkezes_sebzovel
