@@ -23,7 +23,7 @@ pygame.display.set_icon(pygame.image.load('képek/icon.png'))
 clock = pygame.time.Clock()
 
 # egér
-egér = pygame.mouse.get_pos()
+eger = pygame.mouse.get_pos()
 
 # menü
 start_gomb = pygame.image.load('képek/start-gomb.png').convert()
@@ -31,10 +31,16 @@ start_gomb_rect = start_gomb.get_rect(midbottom=(600, 250))
 reset_gomb = pygame.image.load('képek/reset-gomb.png').convert()
 reset_gomb_rect = start_gomb.get_rect(midbottom=(600, 300))
 menu_felirat_font = pygame.font.Font(None, 100)
-menu_felirat = menu_felirat_font.render('Platformer Játék', False, 'White')
+menu_felirat_font2 = pygame.font.Font('Pixeltype.ttf', 125)
+menu_felirat_font3 = pygame.font.Font('Pixeltype.ttf', 125)
+menu_felirat = menu_felirat_font2.render('Platformer Jatek', False, 'Yellow')
+menu_felirat_arnyek = menu_felirat_font3.render('Platformer Jatek', False, 'Black')
 menu = True
 karakterek_gomb = pygame.image.load('képek/karakter-valasztas-gomb.png').convert()
-karakterek_gomb_rect = karakterek_gomb.get_rect(midbottom=(600, 415))
+karakterek_gomb_rect = karakterek_gomb.get_rect(midbottom=(600, 350))
+vissza_gomb = pygame.image.load('képek/vissza-gomb.png').convert()
+mentes_gomb = pygame.image.load('képek/mentes-gomb.png').convert()
+karakter_valasztas_felirat = menu_felirat_font.render('Válassz karaktert!', False, 'White')
 
 
 # mezők
@@ -50,7 +56,7 @@ mezok: list[pygame.Rect] = []  # amelyik rectangelek ebben a listában vannak az
 # mozgo_mezok: list[pygame.Rect] = []
 
 # sebződés
-sebzo_mezo1 = pygame.image.load('képek/sebzo-mezo1.png').convert()
+sebzo_mezo1 = pygame.image.load('képek/sebzo-mezo2.png').convert()
 sebzo_mezok: list[pygame.Rect] = []
 halhatatlan_frame = 0
 
@@ -66,7 +72,8 @@ kamera_mozgas_frame_bal = 0
 kamera_mozgas_frame_jobb = 0
 
 # hátterek
-hatter1 = pygame.image.load('képek/hatter1.png').convert()
+hatter1 = pygame.image.load('képek/hatter2.png').convert()
+hatter2 = pygame.image.load('képek/hatter1.png').convert()
 
 # elmentett adatok lekérése
 
@@ -81,6 +88,7 @@ def mentett_adatok_lekerese(sor):
 
 # lekért adatokból változók
 melyik_palyan_van = int(mentett_adatok_lekerese(1))
+melyik_skin = mentett_adatok_lekerese(3)
 
 # pálya vége
 palya_vege = pygame.image.load('képek/teszt-mezo3.png').convert_alpha()
@@ -96,7 +104,7 @@ jatekos_y_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_y
 eredeti_gravitacio: int = 5
 gravitacio: int = eredeti_gravitacio
 ugras_frame = 0
-jatekos = pygame.image.load('képek/jatekos.png').convert_alpha()
+jatekos = pygame.image.load(melyik_skin).convert_alpha()
 jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
 
 # életerő
@@ -117,6 +125,8 @@ szamlalo_perc = 0
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 szamlalo_font = pygame.font.SysFont('Consolas', 30)
 szamlalo_kiiras = szamlalo_font.render(str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
+ossz_masodperc = 0
+ossz_perc = 0
 
 
 def mezok_megjelenitese(palya):
@@ -149,76 +159,73 @@ def mezok_megjelenitese(palya):
         mezo_x_koordinata += 40
 
 
+# karakter kiválasztására
 def karakterek_menu():
     pygame.init()
 
-    display_width = 1200
-    display_height = 600
-    screen = pygame.display.set_mode((display_width, display_height))
-    pygame.display.set_caption("Karakter skinek")
+    kepernyo_hossza = 1200
+    keprernyo_magassaga = 600
+    screen = pygame.display.set_mode((kepernyo_hossza, keprernyo_magassaga))
+    pygame.display.set_caption("Platformer játék")
 
     BLACK = (0, 0, 0)
-    WHITE = (255, 255, 255)
-    RED = (255, 0, 0)
-    GREEN = (0, 255, 0)
-
-    választott_skin = ["képek//skin1.png", "képek//skin2.png"]
+    választott_skin = ["képek/skin1.png", "képek/skin2.png"]
     karakter_index = 0
 
     character_images = []
     for skin in választott_skin:
         character_images.append(pygame.image.load(skin))
 
-    button_width = 100
-    button_height = 50
-    button_x = display_width - button_width - 20
-    button_y = display_height - button_height - 20
+    gomb_x = kepernyo_hossza - 120
+    gomb_y = keprernyo_magassaga - 70
 
-    start_button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
-    back_button_rect = pygame.Rect(button_x - button_width - 10, button_y, button_width, button_height)
-    save_button_rect = pygame.Rect(button_x - button_width - 10, button_y - button_height - 10, button_width, button_height)
+    vissza_gomb_rect = vissza_gomb.get_rect(midbottom=(gomb_x, gomb_y))
+    mentes_gomb_rect = mentes_gomb.get_rect(midbottom=(gomb_x - 200, gomb_y))
 
-    running = True
+    karakter_valasztas = True
 
-    while running:
+    while karakter_valasztas:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                exit()
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     karakter_index = (karakter_index - 1) % len(választott_skin)
                 elif event.key == pygame.K_RIGHT:
                     karakter_index = (karakter_index + 1) % len(választott_skin)
+
             if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                if back_button_rect.collidepoint(mouse_pos):
-                    running = False
-                if save_button_rect.collidepoint(mouse_pos):
+                eger = pygame.mouse.get_pos()
+
+                if vissza_gomb_rect.collidepoint(eger):
+                    karakter_valasztas = False
+                    break
+                
+
+                if mentes_gomb_rect.collidepoint(eger):
                     save_selected_skin(választott_skin[karakter_index])
 
         screen.fill(BLACK)
 
         selected_skin_image = character_images[karakter_index]
-        screen.blit(selected_skin_image, (display_width // 2 - selected_skin_image.get_width() // 2,
-                                          display_height // 2 - selected_skin_image.get_height() // 2))
+        screen.blit(selected_skin_image, (kepernyo_hossza // 2 - selected_skin_image.get_width() // 2, keprernyo_magassaga // 2 - selected_skin_image.get_height() // 2))
 
-        pygame.draw.rect(screen, RED, back_button_rect)
-        pygame.draw.rect(screen, GREEN, start_button_rect)
-        pygame.draw.rect(screen, WHITE, save_button_rect)
-
-        font = pygame.font.Font(None, 28)
-        text = font.render("Save Skin", True, BLACK)
-        text_rect = text.get_rect(center=save_button_rect.center)
-        screen.blit(text, text_rect)
+        screen.blit(vissza_gomb, vissza_gomb_rect)
+        screen.blit(mentes_gomb, mentes_gomb_rect)
+        ablak.blit(karakter_valasztas_felirat, (325, 100))
 
         pygame.display.flip()
 
-    pygame.display.quit()
-
-
-def save_selected_skin(selected_skin):
-    with open("selected_skin.txt", "w", encoding="utf-8") as file:
-        file.write(selected_skin)
+def save_selected_skin(kivalaszotott_karakter):
+    with open('mentes.txt', 'r+', encoding='utf-8') as file:
+            sorok = file.readlines()
+            sorok[3] = ''
+            sorok.insert(3, kivalaszotott_karakter + '\n')
+            file.seek(0)
+            file.writelines(sorok)
+    file.close()
 
 
 # játék
@@ -232,11 +239,11 @@ while True:
                 pygame.quit()
                 exit()
 
-            egér = pygame.mouse.get_pos()
+            eger = pygame.mouse.get_pos()
 
             # start gomb
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if start_gomb_rect.collidepoint(egér):
+                if start_gomb_rect.collidepoint(eger):
                     szamlalo_masodperc = 0
                     szamlalo_perc = 0
                     menu = False
@@ -244,7 +251,7 @@ while True:
 
             # reset gomb
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if reset_gomb_rect.collidepoint(egér):
+                if reset_gomb_rect.collidepoint(eger):
                     with open('eredeti-mentes.txt', 'r', encoding='utf-8') as uj_fajl:
                         with open('mentes.txt', 'w', encoding='utf-8') as regi_fajl:
                             regi_fajl.write(uj_fajl.read())
@@ -257,14 +264,16 @@ while True:
                     palya_szama_kiiras = palya_szama_font.render(str(melyik_palyan_van) + '. pálya', False, 'White')
                     break
 
+            # karakterválasztás
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if karakterek_gomb_rect.collidepoint(egér):
+                if karakterek_gomb_rect.collidepoint(eger):
                     karakterek_menu()
-
+        
         ablak.blit(hatter1, (0, 0))
         ablak.blit(start_gomb, start_gomb_rect)
         ablak.blit(reset_gomb, reset_gomb_rect)
-        ablak.blit(menu_felirat, (325, 100))
+        ablak.blit(menu_felirat_arnyek, (300, 100))
+        ablak.blit(menu_felirat, (298, 98))
         ablak.blit(karakterek_gomb, karakterek_gomb_rect)
 
         pygame.display.update()
@@ -325,12 +334,12 @@ while True:
                 egér = pygame.mouse.get_pos()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if kovetkezo_palya_gomb_rect.collidepoint(egér):
+                    if kovetkezo_palya_gomb_rect.collidepoint(eger):
                         palya_vege_kepernyo = False
                         break
 
             palya_teljesitve_felirat = menu_felirat_font.render(str(melyik_palyan_van) + '. pálya teljesítve!', False, 'Yellow')
-            ablak.blit(hatter1, (0, 0))
+            ablak.blit(hatter2, (0, 0))
             ablak.blit(palya_teljesitve_felirat, (325, 100))
             ablak.blit(kovetkezo_palya_gomb, kovetkezo_palya_gomb_rect)
             szamlalo_kiiras = szamlalo_font.render('idő: ' + str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
@@ -376,21 +385,21 @@ while True:
                     pygame.quit()
                     exit()
 
-                egér = pygame.mouse.get_pos()
+                eger = pygame.mouse.get_pos()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if ujra_gomb_rect.collidepoint(egér):
+                    if ujra_gomb_rect.collidepoint(eger):
                         kamera_mozgas = 0
                         jatekos_x_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_x
                         jatekos_y_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_y
                         jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
                         eletero_szama = 5
-                        szamlalo_masodperc = 0
-                        szamlalo_perc = 0
+                        #szamlalo_masodperc = 0
+                        #szamlalo_perc = 0
                         halal = False
                         break
 
-            ablak.blit(hatter1, (0, 0))
+            ablak.blit(hatter2, (0, 0))
             ablak.blit(halal_felirat, (425, 100))
             ablak.blit(ujra_gomb, ujra_gomb_rect)
 

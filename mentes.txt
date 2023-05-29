@@ -1,3 +1,4 @@
 pálya száma:
-3
-stb.
+2
+választott skin:
+képek/skin1.png
