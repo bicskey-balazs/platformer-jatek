@@ -1,1 +1,1 @@
-képek//skin1.png
+képek/skin1.png
