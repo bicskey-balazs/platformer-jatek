@@ -169,7 +169,7 @@ def karakterek_menu():
     pygame.display.set_caption("Platformer játék")
 
     BLACK = (0, 0, 0)
-    választott_skin = ["képek/skin1.png", "képek/skin2.png"]
+    választott_skin = ["képek/skin1.png", "képek/skin2.png", "képek/skin3.png", "képek/skin4.png"]  # Ide még mehet ammenyit csak lehet
     karakter_index = 0
 
     character_images = []
@@ -202,7 +202,6 @@ def karakterek_menu():
                 if vissza_gomb_rect.collidepoint(eger):
                     karakter_valasztas = False
                     break
-                
 
                 if mentes_gomb_rect.collidepoint(eger):
                     save_selected_skin(választott_skin[karakter_index])
@@ -218,13 +217,14 @@ def karakterek_menu():
 
         pygame.display.flip()
 
+
 def save_selected_skin(kivalaszotott_karakter):
     with open('mentes.txt', 'r+', encoding='utf-8') as file:
-            sorok = file.readlines()
-            sorok[3] = ''
-            sorok.insert(3, kivalaszotott_karakter + '\n')
-            file.seek(0)
-            file.writelines(sorok)
+        sorok = file.readlines()
+        sorok[3] = ''
+        sorok.insert(3, kivalaszotott_karakter + '\n')
+        file.seek(0)
+        file.writelines(sorok)
     file.close()
 
 
@@ -268,7 +268,7 @@ while True:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if karakterek_gomb_rect.collidepoint(eger):
                     karakterek_menu()
-        
+
         ablak.blit(hatter1, (0, 0))
         ablak.blit(start_gomb, start_gomb_rect)
         ablak.blit(reset_gomb, reset_gomb_rect)
