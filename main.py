@@ -46,6 +46,8 @@ karakter_valasztas_felirat = menu_felirat_font.render('Válassz karaktert!', Fal
 # mezők
 teszt_mezo1 = pygame.image.load('képek/teszt-mezo1.png').convert()
 teszt_mezo2 = pygame.image.load('képek/teszt-mezo2.png').convert()
+teszt_mezo4 = pygame.image.load('képek/teszt-mezo4.png').convert()
+teszt_mezo5 = pygame.image.load('képek/teszt-mezo5.png').convert()
 mezok: list[pygame.Rect] = []  # amelyik rectangelek ebben a listában vannak azokon nem tud átmenni a játékos
 
 # mozgó mező
@@ -74,6 +76,7 @@ kamera_mozgas_frame_jobb = 0
 # hátterek
 hatter1 = pygame.image.load('képek/hatter2.png').convert()
 hatter2 = pygame.image.load('képek/hatter1.png').convert()
+hatter3 = pygame.image.load('képek/hatter3.png').convert()
 
 # elmentett adatok lekérése
 
@@ -84,7 +87,6 @@ def mentett_adatok_lekerese(sor):
         mentes = file.read().splitlines()[sor]
     file.close()
     return mentes
-
 
 # lekért adatokból változók
 melyik_palyan_van = int(mentett_adatok_lekerese(1))
@@ -97,6 +99,23 @@ palya_vege_kepernyo = False
 palya_teljesitve_felirat = menu_felirat_font.render(str(melyik_palyan_van) + '. pálya teljesítve!', False, 'Yellow')
 kovetkezo_palya_gomb = pygame.image.load('képek/kovetkezo-palya-gomb.png').convert()
 kovetkezo_palya_gomb_rect = kovetkezo_palya_gomb.get_rect(midbottom=(600, 250))
+kovetkezo_palya = False
+
+# játék vége
+jatek_vege_kepernyo = False
+jatek_vege = mentett_adatok_lekerese(5)
+jatek_vege_gomb = pygame.image.load('képek/jatek-vege-gomb.png').convert()
+jatek_vege_gomb_rect = jatek_vege_gomb.get_rect(midbottom=(600, 250))
+jatek_vege_felirat = menu_felirat_font.render('Mindegyik pályát teljesítetted!', False, 'Yellow')
+
+# tutorial
+volt_tutorial = mentett_adatok_lekerese(7)
+tutorial_kepernyo = False
+tutorial_vege_gomb = pygame.image.load('képek/tutorial-vege-gomb.png').convert()
+tutorial_vege_gomb_rect = tutorial_vege_gomb.get_rect(midbottom=(600, 450))
+tutorial_felirat_font = pygame.font.Font(None, 50)
+tutorial_felirat1 = tutorial_felirat_font.render('A, D gombokkal lehet jobbra, balra mozogni', False, 'White')
+tutorial_felirat2 = tutorial_felirat_font.render('W gombbal lehet ugrani', False, 'White')
 
 # játékos
 jatekos_x_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_x
@@ -125,8 +144,6 @@ szamlalo_perc = 0
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 szamlalo_font = pygame.font.SysFont('Consolas', 30)
 szamlalo_kiiras = szamlalo_font.render(str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
-ossz_masodperc = 0
-ossz_perc = 0
 
 
 def mezok_megjelenitese(palya):
@@ -155,6 +172,12 @@ def mezok_megjelenitese(palya):
         elif mezo == '4':
             sebzo_mezok.append(pygame.draw.rect(ablak, (0, 0, 0), (mezo_x_koordinata, mezo_y_koordinata, 40, 40)))
             ablak.blit(sebzo_mezo1, (mezo_x_koordinata, mezo_y_koordinata))
+        elif mezo == '5':
+            mezok.append(pygame.draw.rect(ablak, (0, 0, 0), (mezo_x_koordinata, mezo_y_koordinata, 40, 40)))
+            ablak.blit(teszt_mezo4, (mezo_x_koordinata, mezo_y_koordinata))
+        elif mezo == '6':
+            mezok.append(pygame.draw.rect(ablak, (0, 0, 0), (mezo_x_koordinata, mezo_y_koordinata, 40, 40)))
+            ablak.blit(teszt_mezo5, (mezo_x_koordinata, mezo_y_koordinata))
 
         mezo_x_koordinata += 40
 
@@ -262,6 +285,7 @@ while True:
                     jatekos_y_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_y
                     jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
                     palya_szama_kiiras = palya_szama_font.render(str(melyik_palyan_van) + '. pálya', False, 'White')
+                    volt_tutorial = '0'
                     break
 
             # karakterválasztás
@@ -269,7 +293,10 @@ while True:
                 if karakterek_gomb_rect.collidepoint(eger):
                     karakterek_menu()
 
-        ablak.blit(hatter1, (0, 0))
+        if jatek_vege == '0':
+            ablak.blit(hatter1, (0, 0))
+        else:
+            ablak.blit(hatter3, (0, 0))
         ablak.blit(start_gomb, start_gomb_rect)
         ablak.blit(reset_gomb, reset_gomb_rect)
         ablak.blit(menu_felirat_arnyek, (300, 100))
@@ -281,15 +308,50 @@ while True:
         clock.tick(60)
     # menü vége
 
+    # tutorial
+    if volt_tutorial == '0':
+        tutorial_kepernyo = True
+    else:
+        tutorial_kepernyo = False
+    while tutorial_kepernyo:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+            eger = pygame.mouse.get_pos()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if tutorial_vege_gomb_rect.collidepoint(eger):
+                    tutorial_kepernyo = False
+                    volt_tutorial = '1'
+                    with open('mentes.txt', 'r+', encoding='utf-8') as file:
+                        sorok = file.readlines()
+                        sorok[7] = ''
+                        sorok.insert(7,'1\n')
+                        file.seek(0)
+                        file.writelines(sorok)
+                    file.close()
+                    break
+                
+        ablak.blit(hatter2, (0, 0))
+        ablak.blit(tutorial_felirat1, (300, 100))
+        ablak.blit(tutorial_felirat2, (300, 200))
+        ablak.blit(tutorial_vege_gomb, tutorial_vege_gomb_rect)
+
+        pygame.display.update()
+
+        clock.tick(60)
+
     for event in pygame.event.get():
 
         # számláló
+        if szamlalo_masodperc == 59:
+            szamlalo_masodperc = -1
+            szamlalo_perc += 1
         if event.type == pygame.USEREVENT:
             szamlalo_masodperc += 1
             szamlalo_kiiras = szamlalo_font.render(str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
-        if szamlalo_masodperc == 60:
-            szamlalo_masodperc = 0
-            szamlalo_perc += 1
 
         # játék bezárása
         if event.type == pygame.QUIT:
@@ -323,7 +385,55 @@ while True:
     # átvált a következő pályára
     if erintkezes_barhogy(jatekos_rect, palya_vege_rect):
         palya_vege_kepernyo = True
+        # ha kivitted az utolsó pályát
+        if melyik_palyan_van == len(palyak):
+            jatek_vege_kepernyo = True
+            while jatek_vege_kepernyo:
+                for event in pygame.event.get():
+
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+
+                    eger = pygame.mouse.get_pos()
+
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if jatek_vege_gomb_rect.collidepoint(eger):
+                            melyik_palyan_van = 1
+                            jatekos_x_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_x
+                            jatekos_y_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_y
+                            jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
+                            jatek_vege_kepernyo = False
+                            palya_vege_kepernyo = False
+                            menu = True
+                            jatek_vege = '1'
+                            palya_szama_kiiras = palya_szama_font.render(str(melyik_palyan_van) + '. pálya', False, 'White')
+                            with open('mentes.txt', 'r+', encoding='utf-8') as file:
+                                sorok = file.readlines()
+                                sorok[1] = ''
+                                sorok.insert(1,'1\n')
+                                file.seek(0)
+                                file.writelines(sorok)
+                            file.close()
+                            with open('mentes.txt', 'r+', encoding='utf-8') as file:
+                                sorok = file.readlines()
+                                sorok[5] = ''
+                                sorok.insert(5,'1\n')
+                                file.seek(0)
+                                file.writelines(sorok)
+                            file.close()
+                            break
+                
+                ablak.blit(hatter2, (0, 0))
+                ablak.blit(jatek_vege_felirat, (100, 100))
+                ablak.blit(jatek_vege_gomb, jatek_vege_gomb_rect)
+                    
+                pygame.display.update()
+
+                clock.tick(60)
         # kírja, hogy teljesítetted a pályát
+        palya_teljesitve_felirat = menu_felirat_font.render(str(melyik_palyan_van) + '. pálya teljesítve!', False, 'Yellow')
+        szamlalo_kiiras = szamlalo_font.render('idő: ' + str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
         while palya_vege_kepernyo:
             for event in pygame.event.get():
 
@@ -331,40 +441,42 @@ while True:
                     pygame.quit()
                     exit()
 
-                egér = pygame.mouse.get_pos()
+                eger = pygame.mouse.get_pos()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if kovetkezo_palya_gomb_rect.collidepoint(eger):
                         palya_vege_kepernyo = False
+                        kovetkezo_palya = True
                         break
 
-            palya_teljesitve_felirat = menu_felirat_font.render(str(melyik_palyan_van) + '. pálya teljesítve!', False, 'Yellow')
             ablak.blit(hatter2, (0, 0))
             ablak.blit(palya_teljesitve_felirat, (325, 100))
             ablak.blit(kovetkezo_palya_gomb, kovetkezo_palya_gomb_rect)
-            szamlalo_kiiras = szamlalo_font.render('idő: ' + str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
             ablak.blit(szamlalo_kiiras, (325, 350))
 
             pygame.display.update()
 
             clock.tick(60)
-        kamera_mozgas = 0
-        szamlalo_masodperc = 0
-        szamlalo_perc = 0
-        szamlalo_kiiras = szamlalo_font.render(str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
-        melyik_palyan_van += 1
-        jatekos_x_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_x
-        jatekos_y_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_y
-        with open('mentes.txt', 'r+', encoding='utf-8') as file:
-            sorok = file.readlines()
-            uj_palya_szama = int(sorok[1]) + 1
-            sorok[1] = ''
-            sorok.insert(1, str(uj_palya_szama) + '\n')
-            file.seek(0)
-            file.writelines(sorok)
-        file.close()
-        jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
-        palya_szama_kiiras = palya_szama_font.render(str(melyik_palyan_van) + '. pálya', False, 'White')
+        
+        if kovetkezo_palya:
+            kamera_mozgas = 0
+            melyik_palyan_van += 1
+            jatekos_x_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_x
+            jatekos_y_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_y
+            with open('mentes.txt', 'r+', encoding='utf-8') as file:
+                sorok = file.readlines()
+                uj_palya_szama = int(sorok[1]) + 1
+                sorok[1] = ''
+                sorok.insert(1, str(uj_palya_szama) + '\n')
+                file.seek(0)
+                file.writelines(sorok)
+            file.close()
+            szamlalo_masodperc = 0
+            szamlalo_perc = 0
+            szamlalo_kiiras = szamlalo_font.render(str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
+            jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
+            palya_szama_kiiras = palya_szama_font.render(str(melyik_palyan_van) + '. pálya', False, 'White')
+            kovetkezo_palya = False
 
     # mezők megjelenítése
     mezok_megjelenitese(palyak[melyik_palyan_van - 1].txt_fajl)
