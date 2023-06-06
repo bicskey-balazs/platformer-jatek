@@ -8,7 +8,7 @@ pygame.init()
 # pálya osztály
 palyak: list[Palya] = []
 palya_szama: int = 1
-for e in range(3):
+for e in range(10):
     fajl_neve: str = 'pályák/palya' + str(palya_szama) + '.txt'
     with open(fajl_neve, 'r', encoding='utf-8') as fajl:
         palyak.append(Palya(fajl.readlines()))
@@ -48,6 +48,9 @@ teszt_mezo1 = pygame.image.load('képek/teszt-mezo1.png').convert()
 teszt_mezo2 = pygame.image.load('képek/teszt-mezo2.png').convert()
 teszt_mezo4 = pygame.image.load('képek/teszt-mezo4.png').convert()
 teszt_mezo5 = pygame.image.load('képek/teszt-mezo5.png').convert()
+teszt_mezo6 = pygame.image.load('képek/teszt-mezo6.png').convert()
+teszt_mezo7 = pygame.image.load('képek/teszt-mezo7.png').convert()
+teszt_mezo8 = pygame.image.load('képek/teszt-mezo8.png').convert()
 mezok: list[pygame.Rect] = []  # amelyik rectangelek ebben a listában vannak azokon nem tud átmenni a játékos
 
 # mozgó mező
@@ -135,6 +138,8 @@ eletero_kiiras_seged = 0
 # adatok kiírásához kellenek
 palya_szama_font = pygame.font.Font(None, 50)
 palya_szama_kiiras = palya_szama_font.render(str(melyik_palyan_van) + '. pálya', False, 'White')
+if melyik_palyan_van == 10:
+    palya_szama_kiiras = palya_szama_font.render('10.pálya', False, 'White')
 kiiras_hatter = pygame.image.load('képek/kiiras-hatter1.png').convert()
 kiiras_hatter_rect = kiiras_hatter.get_rect(midbottom=(0, 45))
 
@@ -178,6 +183,14 @@ def mezok_megjelenitese(palya):
         elif mezo == '6':
             mezok.append(pygame.draw.rect(ablak, (0, 0, 0), (mezo_x_koordinata, mezo_y_koordinata, 40, 40)))
             ablak.blit(teszt_mezo5, (mezo_x_koordinata, mezo_y_koordinata))
+        elif mezo == '7':
+            mezok.append(pygame.draw.rect(ablak, (0, 0, 0), (mezo_x_koordinata, mezo_y_koordinata, 40, 40)))
+            ablak.blit(teszt_mezo6, (mezo_x_koordinata, mezo_y_koordinata))
+        elif mezo == '8':
+            ablak.blit(teszt_mezo7, (mezo_x_koordinata, mezo_y_koordinata))
+        elif mezo == '9':
+            mezok.append(pygame.draw.rect(ablak, (0, 0, 0), (mezo_x_koordinata, mezo_y_koordinata, 40, 40)))
+            ablak.blit(teszt_mezo8, (mezo_x_koordinata, mezo_y_koordinata))
 
         mezo_x_koordinata += 40
 
@@ -279,6 +292,7 @@ while True:
                         with open('mentes.txt', 'w', encoding='utf-8') as regi_fajl:
                             regi_fajl.write(uj_fajl.read())
                     melyik_palyan_van = 1
+                    eletero_szama = 5
                     kamera_mozgas = 0
                     palya_vege_rect = palya_vege.get_rect(midbottom=(-5000, -5000))
                     jatekos_x_koordinata = palyak[melyik_palyan_van - 1].kezdo_pont_x
@@ -407,6 +421,7 @@ while True:
                             palya_vege_kepernyo = False
                             menu = True
                             jatek_vege = '1'
+                            eletero_szama = 5
                             palya_szama_kiiras = palya_szama_font.render(str(melyik_palyan_van) + '. pálya', False, 'White')
                             with open('mentes.txt', 'r+', encoding='utf-8') as file:
                                 sorok = file.readlines()
@@ -471,11 +486,14 @@ while True:
                 file.seek(0)
                 file.writelines(sorok)
             file.close()
+            eletero_szama = 5
             szamlalo_masodperc = 0
             szamlalo_perc = 0
             szamlalo_kiiras = szamlalo_font.render(str(szamlalo_perc) + ':' + str(szamlalo_masodperc), False, 'White')
             jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
             palya_szama_kiiras = palya_szama_font.render(str(melyik_palyan_van) + '. pálya', False, 'White')
+            if melyik_palyan_van == 10:
+                palya_szama_kiiras = palya_szama_font.render('10.pálya', False, 'White')
             kovetkezo_palya = False
 
     # mezők megjelenítése
