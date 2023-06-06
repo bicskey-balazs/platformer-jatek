@@ -10,9 +10,9 @@ class Palya:
         return vissza
 
     def __init__(self, fajl):
-        self.txt_fajl = self.palya_beolvasasa(fajl[0:13])
-        self.kezdo_pont_x = int(str(fajl[14]).strip('\n'))
-        self.kezdo_pont_y = int(str(fajl[15]).strip('\n'))
+        self.txt_fajl = self.palya_beolvasasa(fajl[0:14])
+        self.kezdo_pont_x = int(str(fajl[15]).strip('\n'))
+        self.kezdo_pont_y = int(str(fajl[16]).strip('\n'))
 
 #pv = fajl[1414:1419]
 #kp = fajl[1420:1425]
