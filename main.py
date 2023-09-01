@@ -306,6 +306,9 @@ while True:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if karakterek_gomb_rect.collidepoint(eger):
                     karakterek_menu()
+                    melyik_skin = mentett_adatok_lekerese(3)
+                    jatekos = pygame.image.load(melyik_skin).convert_alpha()
+                    jatekos_rect = jatekos.get_rect(midbottom=(jatekos_x_koordinata, jatekos_y_koordinata))
 
         if jatek_vege == '0':
             ablak.blit(hatter1, (0, 0))
